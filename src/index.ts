@@ -106,7 +106,11 @@ export default function rabbitTEA(mainPackagePath?: string): Plugin {
     const result = spawnSync('moon', ['build', '--target', 'js', isBuild ? '--release' : '--debug']);
     if (result.status == 0) {
       cpSync(outputJsPath(), tempJsPath);
-      cpSync(outputSourceMapPath(), tempSourceMapPath);
+      // Only copy source map if it exists (release builds don't generate source maps)
+      const sourceMapPath = outputSourceMapPath();
+      if (fs.existsSync(sourceMapPath)) {
+        cpSync(sourceMapPath, tempSourceMapPath);
+      }
       hasError = false;
     } else {
       hasError = true;
